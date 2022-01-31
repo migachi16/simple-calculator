@@ -19,7 +19,7 @@ layout =  [
 
           [psg.B('('), psg.B('C'), psg.B('=', enable_events = True), psg.B(')')],
 
-          [psg.T('Result:'), psg.Output(size = (25, 1), key = '-EQL-'), psg.B('Exit')]
+          [psg.T('Result:'), psg.Output(size = (25, 4), key = '-EQL-'), psg.B('Exit')]
           
           ]
 
@@ -40,60 +40,42 @@ while True:
         #
         case '1':
             expression += '1'
-            window['-EXP-'].update(expression)
         case '2':
             expression += '2'  
-            window['-EXP-'].update(expression)
         case '3':
             expression += '3'
-            window['-EXP-'].update(expression)
         case '4':
             expression += '4' 
-            window['-EXP-'].update(expression)
         case '5':
             expression += '5'
-            window['-EXP-'].update(expression)
         case '6':
             expression += '6'
-            window['-EXP-'].update(expression)
         case '7':
             expression += '7'
-            window['-EXP-'].update(expression)
         case '8':
             expression += '8' 
-            window['-EXP-'].update(expression)
         case '9':
             expression += '9'
-            window['-EXP-'].update(expression)
         case '0':
             expression += '0'    
-            window['-EXP-'].update(expression)
         case '+':
             expression += '+'
-            window['-EXP-'].update(expression)
         case '-':
             expression += '-'
-            window['-EXP-'].update(expression)
         case '\u00f7':
             expression += '\u00f7'
-            window['-EXP-'].update(expression)
         case '*':
             expression += '*'    
-            window['-EXP-'].update(expression)
         case '.':
             expression += '.'    
-            window['-EXP-'].update(expression)
         case '^':
             expression += '^'    
-            window['-EXP-'].update(expression)
         case '(':
             expression += '('   
             left_paren_ct += 1 
-            window['-EXP-'].update(expression)
         case ')':
             expression += ')'    
             right_paren_ct += 1 
-            window['-EXP-'].update(expression)
         #
         #   Mundane buttons ^
         #
@@ -106,10 +88,10 @@ while True:
             answer = hf.execute(expression) # Execute the algebraic expression
             #
             print('Your answer is ', answer)
-            window['-EXP-'].update(expression)
         case 'C':
             expression = ''
             left_paren_ct, right_paren_ct = 0, 0
-            window['-EXP-'].update(expression)
+    window['-EXP-'].update(expression)
+
 
 window.close()
