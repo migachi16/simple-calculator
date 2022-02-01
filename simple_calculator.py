@@ -27,7 +27,6 @@ window = psg.Window(title, layout, element_justification = 'c')
 
 expression = ''
 previous_ans = ''
-left_paren_ct, right_paren_ct = 0, 0
 
 while True:
     event, vals = window.read()
@@ -72,25 +71,23 @@ while True:
             expression += '^'    
         case '(':
             expression += '('   
-            left_paren_ct += 1 
         case ')':
             expression += ')'    
-            right_paren_ct += 1 
         #
         #   Mundane buttons ^
         #
         case '=':
-            if left_paren_ct != right_paren_ct:
+            valid = hf.check_parentheses(expression)
+            if valid:
+                #
+                answer = hf.execute(expression) # Execute the algebraic expression
+                #
+                print(str(answer))
+            else:
                 print('Your parentheses do not match!')
-                continue
-            print('Your expression is '+ expression)
-            #
-            answer = hf.execute(expression) # Execute the algebraic expression
-            #
-            print('Your answer is ', answer)
-        case 'C':
+        case 'C': # clear
             expression = ''
-            left_paren_ct, right_paren_ct = 0, 0
+
     window['-EXP-'].update(expression)
 
 
