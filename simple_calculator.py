@@ -23,7 +23,7 @@ layout =  [
           
           ]
 
-window = psg.Window(title, layout, element_justification = 'c')
+window = psg.Window(title, layout, return_keyboard_events = True, element_justification = 'c')
 
 expression = ''
 previous_ans = ''
@@ -72,8 +72,14 @@ while True:
         case '(':
             expression += '('   
         case ')':
-            expression += ')'    
-        #
+            expression += ')'   
+        case 'BackSpace:22':
+                if len(expression) == 0:
+                    continue
+                li = list(expression)
+                li.pop()
+                expression = ''.join(li)
+        #       
         #   Mundane buttons ^
         #
         case '=':
