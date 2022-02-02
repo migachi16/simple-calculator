@@ -2,39 +2,44 @@ import PySimpleGUI as psg
 import helper_funcs as hf
 
 psg.theme('dark green 7')
+psg.set_options(font = ("Fira Code", 16))
 
 title = 'Simple Calculator'
 
-layout =  [
+layout =    [
 
-          [psg.T('Input an algebraic expression with the buttons or the keyboard.')], 
-          
-          [psg.In(key = '-EXP-')],
+                [psg.T('Input an algebraic expression with the buttons or the keyboard.')], 
+                
+                [psg.In(key = '-EXP-')],
 
-          [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+')],
-          [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-')],
-          [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*')],
+                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+')],
+                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-')],
+                [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*')],
 
-          [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7')],
+                [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7')],
 
-          [psg.B('('), psg.B('C'), psg.B('=', enable_events = True), psg.B(')')],
+                [psg.B('('), psg.B('C'), psg.B('=', enable_events = True), psg.B(')')],
 
-          [psg.T('Result:'), psg.Output(size = (25, 4), key = '-EQL-'), psg.B('Exit')]
-          
-          ]
+                [psg.T('Result:'), psg.Output(size = (25, 5), key = '-EQL-'), psg.B('Exit')]
+                
+            ]
+
+menu_def =  [
+
+            ]
 
 window = psg.Window(title, layout, return_keyboard_events = True, element_justification = 'c')
 
 expression = ''
 previous_ans = ''
-all_keys = ['1:10', '2:11', '3:12', '4:13', '5:14', '6:15', '7:16',
-            '8:17', '9:18', '0:19', 'minus:20', 
-            'equal:21', 'BackSpace:22', 'slash:61', 'period:60', 
-            'Return:36', 'Shift_R:62', 'Shift_L:50',]
-
 
 while True:
     event, vals = window.read()
+
+    if ':' in event:
+        idx = event.index(':')
+        event = event[:-(len(event) - idx)] # extended keyboard input handling for the form xxx:#
+
     match event:
         #
         case psg.WIN_CLOSED:
@@ -42,35 +47,35 @@ while True:
         case 'Exit':
             break
         #
-        case '1' | '1:10':
+        case '1':
             expression += '1'
-        case '2' | '2:11':
+        case '2':
             expression += '2'  
-        case '3' | '3:12':
+        case '3':
             expression += '3'
-        case '4' | '4:13':
+        case '4':
             expression += '4' 
-        case '5' | '5:14':
+        case '5':
             expression += '5'
-        case '6' | '6:15':
+        case '6':
             expression += '6'
-        case '7' | '7:16':
+        case '7':
             expression += '7'
-        case '8' | '8:17':
+        case '8':
             expression += '8' 
-        case '9' | '9:18':
+        case '9':
             expression += '9'
-        case '0' | '0:19':
+        case '0':
             expression += '0'    
-        case '+':
+        case '+' | 'equal' | 'plus':
             expression += '+'
-        case '-' | 'minus:20':
+        case '-' | 'minus':
             expression += '-'
-        case '\u00f7' | 'slash:61':
+        case '\u00f7' | 'slash' | '/':
             expression += '\u00f7'
         case '*':
             expression += '*'    
-        case '.' | 'period:60':
+        case '.' | 'period':
             expression += '.'    
         case '^':
             expression += '^'    
@@ -78,15 +83,15 @@ while True:
             expression += '('   
         case ')':
             expression += ')'   
-        case 'BackSpace:22':
-                if len(expression) == 0:
-                    continue
-                expression = expression[:-1]
+        case 'BackSpace':
+            if len(expression) == 0:
+                continue 
+            expression = expression[:-1]
         #       
         #   Mundane buttons ^
         #
-        case '=' | 'Return:36':
-            valid = hf.check_parentheses(expression)
+        case '=' | 'Return':
+            valid = hf.check_parentheses(expression) # Parentheses matching
             if valid:
                 #
                 answer = hf.execute(expression) # Execute the algebraic expression
