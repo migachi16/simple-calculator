@@ -81,9 +81,7 @@ while True:
         case 'BackSpace:22':
                 if len(expression) == 0:
                     continue
-                li = list(expression)
-                li.pop()
-                expression = ''.join(li)
+                expression = expression[:-1]
         #       
         #   Mundane buttons ^
         #
