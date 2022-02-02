@@ -27,45 +27,50 @@ window = psg.Window(title, layout, return_keyboard_events = True, element_justif
 
 expression = ''
 previous_ans = ''
+all_keys = ['1:10', '2:11', '3:12', '4:13', '5:14', '6:15', '7:16',
+            '8:17', '9:18', '0:19', 'minus:20', 
+            'equal:21', 'BackSpace:22', 'slash:61', 'period:60', 
+            'Return:36', 'Shift_R:62', 'Shift_L:50',]
+
 
 while True:
     event, vals = window.read()
     match event:
         #
         case psg.WIN_CLOSED:
-            break
+            break   
         case 'Exit':
             break
         #
-        case '1':
+        case '1' | '1:10':
             expression += '1'
-        case '2':
+        case '2' | '2:11':
             expression += '2'  
-        case '3':
+        case '3' | '3:12':
             expression += '3'
-        case '4':
+        case '4' | '4:13':
             expression += '4' 
-        case '5':
+        case '5' | '5:14':
             expression += '5'
-        case '6':
+        case '6' | '6:15':
             expression += '6'
-        case '7':
+        case '7' | '7:16':
             expression += '7'
-        case '8':
+        case '8' | '8:17':
             expression += '8' 
-        case '9':
+        case '9' | '9:18':
             expression += '9'
-        case '0':
+        case '0' | '0:19':
             expression += '0'    
         case '+':
             expression += '+'
-        case '-':
+        case '-' | 'minus:20':
             expression += '-'
-        case '\u00f7':
+        case '\u00f7' | 'slash:61':
             expression += '\u00f7'
         case '*':
             expression += '*'    
-        case '.':
+        case '.' | 'period:60':
             expression += '.'    
         case '^':
             expression += '^'    
@@ -82,7 +87,7 @@ while True:
         #       
         #   Mundane buttons ^
         #
-        case '=':
+        case '=' | 'Return:36':
             valid = hf.check_parentheses(expression)
             if valid:
                 #
@@ -95,6 +100,5 @@ while True:
             expression = ''
 
     window['-EXP-'].update(expression)
-
 
 window.close()
