@@ -5,14 +5,31 @@ def typed_out(x: str) -> int:
     pass
 
 def execute(x: str) -> float:
-    #
-    # Input parsing and expression execution
-    #
-    nums = re.split('\*|\^|-|\+|\u00f7', x)
-    operators = list(filter(('').__ne__, re.split('[0-9, .]', x)))
-    total = 0
-
-    return 0.0
+    """
+    Input parsing and expression execution
+    """
+    nums = list(filter(None, (re.split('\(|\)|\*|\^|-|\+|\u00f7', x)))) # A list of all the numbers in the expression
+    operators = ''.join(re.split('[0-9, .]', x)) # A list of all the operators in the expression
+    print(operators)
+    print(nums)
+    total = 0.0
+    for op in operators:
+        match op:
+            case '(':
+                continue
+            case ')':
+                continue
+            case '-':
+                continue
+            case '+':
+                continue
+            case '*':
+                continue
+            case '\u00f7':
+                continue
+            case '^':
+                continue
+    return total
 
 def check_parentheses(x: str) -> bool:
     #
@@ -37,6 +54,9 @@ def check_parentheses(x: str) -> bool:
 # Tests
 #
 
+sta = '(12.1*623^23)\u00f72-33+1' # Should be evaluated to ~1.1349597 * 10^65
+execute(sta)
+
 #a = ')(121)(' # False
 #b = '()()()9()' # True
 #c = '(1(12(3)*3)+21(23*2))' # True
@@ -45,7 +65,3 @@ def check_parentheses(x: str) -> bool:
 #print(check_parentheses(b))
 #print(check_parentheses(c))
 #print(check_parentheses(d))
-#sta = '12.1*623^23\u00f70-33+1'
-#ops = list(filter(('').__ne__, re.split('[0-9, .]', sta)))
-#numz = re.split('\*|\^|-|\+|\u00f7', sta)
-#print(ops)
