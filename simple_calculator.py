@@ -31,7 +31,8 @@ layout =    [
 
                 [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7'), psg.Push(), psg.Push()],
 
-                [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True, bind_return_key = True), psg.Push(), psg.Push(), psg.B('Show Log')],
+                [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True), 
+                    psg.Push(), psg.Push(), psg.B('Show Log')],
 
                 [psg.VPush()],
 
@@ -39,30 +40,29 @@ layout =    [
                 
             ]
 
-window = psg.Window(title, layout, alpha_channel = 0.85, return_keyboard_events = True, right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
+window =    psg.Window(title, layout, alpha_channel = 0.85, return_keyboard_events = True, 
+            right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
 
 expression = ''
 previous_ans = ''
 just_solved = False
-
 
 """
 Main window event loop
 """
 while True:
     event, vals = window.read()
+    a = len(expression)
 
     if event is psg.WIN_CLOSED or event == 'Exit':
         break
 
     if ':' in event:
         idx = event.index(':')
-        event = event[:-(len(event) - idx)] # extended keyboard input handling for the form xxx:#
+        event = event[:-(len(event) - idx)] # Extended keyboard input handling for the form xxx:#
 
-    if just_solved == True and event not in '0123456789.()': # input of operator following a calculated output
+    if just_solved == True and event not in {'ANS', 'BackSpace'} and event not in '0123456789.()=':    # Input of operator following a calculated output
         expression = previous_ans
-    
-    just_solved = False
 
     match event:
         case 'Edit Me':
@@ -109,25 +109,23 @@ while True:
             if len(expression) == 0:
                 continue 
             expression = expression[:-1]
-        #       
-        #   Mundane buttons ^
-        #
         case '=' | 'Return':
-            valid = hf.check_parentheses(expression) # Parentheses matching
+            valid = hf.check_parentheses(expression)    # Parentheses matching
             if valid:
-                #
-                answer = hf.execute(expression) # Execute the algebraic expression
-                #
+                answer = str(hf.unifier(expression)) # Execute the algebraic expression
                 just_solved = True
-                previous_ans = str(answer)
-                window['-EQL-'].update(str(answer))
+                previous_ans = answer
+                window['-EQL-'].update(answer) # Display the answer
                 continue
             else:
                 psg.popup_no_wait('Your parentheses do not match!')
-        case 'C': # clear
+        case 'C':   # Clear
             expression = ''
         case 'ANS': 
             expression += previous_ans
+
+    if just_solved and len(expression) != a:
+        just_solved = False
 
     window['-EXP-'].update(expression)
 
