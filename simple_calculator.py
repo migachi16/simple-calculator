@@ -3,8 +3,8 @@ import helper_funcs as hf
 
 nums = '0123456789'
 
-psg.theme('dark green 7')
-psg.set_options(font = ("Fira Code", 16))
+psg.theme('TealMono')
+psg.set_options(font = ("Fira Code", 14))
 
 title = 'Simple Calculator'
 
@@ -17,46 +17,58 @@ menu_def =  [
 
 layout =    [
 
-                [psg.T('Input an algebraic expression with the buttons or the keyboard.')], 
+                [psg.T('Input an algebraic expression with the buttons or the keyboard.'), psg.Push()], 
                 
                 [psg.Menu(menu_def)],
 
                 [psg.In(key = '-EXP-')],
+                
+                [psg.VPush()],
 
-                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+'), psg.B('ANS')],
-                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-')],
-                [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*')],
+                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+'),psg.Push(), psg.Push(), psg.B('ANS')],
+                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-'), psg.Push(), psg.Push()],
+                [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*'), psg.Push(), psg.Push()],
 
-                [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7')],
+                [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7'), psg.Push(), psg.Push()],
 
-                [psg.B('('), psg.B('C'), psg.B('=', enable_events = True), psg.B(')')],
+                [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True, bind_return_key = True), psg.Push(), psg.Push(), psg.B('Show Log')],
 
-                [psg.T('Result:'), psg.Output(size = (25, 5), key = '-EQL-'), psg.B('Exit')]
+                [psg.VPush()],
+
+                [psg.T('Result:'), psg.Txt(key = '-EQL-'), psg.Push(), psg.B('Exit')]
                 
             ]
 
-window = psg.Window(title, layout, return_keyboard_events = True, element_justification = 'c')
+window = psg.Window(title, layout, alpha_channel = 0.85, return_keyboard_events = True, right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
 
 expression = ''
 previous_ans = ''
 just_solved = False
 
+
+"""
+Main window event loop
+"""
 while True:
     event, vals = window.read()
+
+    if event is psg.WIN_CLOSED or event == 'Exit':
+        break
 
     if ':' in event:
         idx = event.index(':')
         event = event[:-(len(event) - idx)] # extended keyboard input handling for the form xxx:#
 
-    #if just_solved == True and event not in nums:
-        
+    if just_solved == True and event not in '0123456789.()': # input of operator following a calculated output
+        expression = previous_ans
+    
+    just_solved = False
+
     match event:
-        #
-        case psg.WIN_CLOSED:
-            break   
-        case 'Exit':
-            break
-        #
+        case 'Edit Me':
+            psg.execute_editor(__file__)
+        case 'Version': 
+            psg.popup_scrolled(psg.get_versions())
         case '1':
             expression += '1'
         case '2':
@@ -108,9 +120,10 @@ while True:
                 #
                 just_solved = True
                 previous_ans = str(answer)
-                print(str(answer))
+                window['-EQL-'].update(str(answer))
+                continue
             else:
-                print('Your parentheses do not match!')
+                psg.popup_no_wait('Your parentheses do not match!')
         case 'C': # clear
             expression = ''
         case 'ANS': 
