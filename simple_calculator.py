@@ -41,7 +41,7 @@ layout =    [
             ]
 
 window =    psg.Window(title, layout, alpha_channel = 0.85, return_keyboard_events = True, 
-            right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
+                right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
 
 expression = ''
 previous_ans = ''
@@ -61,7 +61,8 @@ while True:
         idx = event.index(':')
         event = event[:-(len(event) - idx)] # Extended keyboard input handling for the form xxx:#
 
-    if just_solved == True and event not in {'ANS', 'BackSpace'} and event not in '0123456789.()=':    # Input of operator following a calculated output
+    if just_solved is True and event in {'+', 'plus', '-', 'minus', 
+                                            '\u00f7', 'slash', '/', '*', '^'}:  # Input of operator following a calculated output
         expression = previous_ans
 
     match event:
@@ -89,7 +90,7 @@ while True:
             expression += '9'
         case '0':
             expression += '0'    
-        case '+' | 'equal' | 'plus':
+        case '+' | 'plus':
             expression += '+'
         case '-' | 'minus':
             expression += '-'

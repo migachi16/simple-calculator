@@ -38,25 +38,22 @@ def check_parentheses(x: str) -> bool:
             right_par_idx.append(idx)
     return True
 
-def execute(block: str) -> float:
+def execute(start_pos: int, end_pos: int) -> float:
     """
     Evaluation of basic calculation blocks, sans parentheses. Called only by 'unifier'
     """
-    print(left_par_idx)
-    print(right_par_idx)
-    print(operators)
-    print(nums)
-    total = 0.0
-    for op in operators:
+    block_nums = list(map(float, nums[start_pos : end_pos]))
+    block_ops = operators[start_pos : end_pos - 1]
+    total = block_nums[0]
+    for i in range(1, len(block_nums)):
+        next = block_nums[i]
+        op = block_ops[i - 1]
         match op:
-            case '(':
-                continue
-            case ')':
-                continue
             case '-':
                 continue
             case '+':
-                continue
+                if i + 1 == len(block_nums) or block_ops[i] != '^':
+                    total += next
             case '*':
                 continue
             case '\u00f7':
@@ -69,8 +66,14 @@ def unifier(x: str) -> float:
     """
     Breaks up the expression into parenthetical segments and evaluates them, bottom up.
     """
-    if left_par_idx is None:
-        return execute(x)
+    print(left_par_idx)
+    print(right_par_idx)
+    print(operators)
+    print(nums)
+    if len(nums) == 1:
+        return nums[0]
+    if not len(left_par_idx):
+        return execute(0, len(nums))
     total = 0.0
 
     return 0.0
@@ -79,9 +82,9 @@ def unifier(x: str) -> float:
 # Tests
 #
 
-sta = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
+st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
+sta = '12.1*623^23\u00f72-33+1'
 check_parentheses(sta)
-execute(sta)
 
 #a = ')(121)(' # False
 #b = '()()()9()' # True
