@@ -16,8 +16,7 @@ def check_parentheses(x: str) -> bool:
     right = 0
     for char in x:
         if right > left:    # An expression is invalid if this is true at any point in the loop
-            valid = False
-            break
+            return False
         if char == '(':
             left += 1
         elif char == ')':
@@ -30,6 +29,9 @@ def check_parentheses(x: str) -> bool:
     a = re.split('\(|\)|\*|\^|-|\+|\u00f7', x)  # Regex helps!
     b = re.split('[0-9, .]', x)
     nums = list(filter(None, a))
+    for num in nums:
+        if num.count('.') > 1:  # Some trolls, nevertheless, may wish to push upon you decidecimal numbers...
+            return False
     operators = ''.join(b)
     for idx, op in enumerate(operators):
         if op == '(':
@@ -42,7 +44,7 @@ def execute(start_pos: int, end_pos: int) -> float:
     """
     Evaluation of basic calculation blocks, sans parentheses. Called only by 'unifier'
     """
-    block_nums = list(map(float, nums[start_pos : end_pos]))
+    block_nums = list(map(float, nums[start_pos : end_pos]))    # New nums and operators lists, specific to the block
     block_ops = operators[start_pos : end_pos - 1]
     total = block_nums[0]
     for i in range(1, len(block_nums)):
@@ -50,16 +52,21 @@ def execute(start_pos: int, end_pos: int) -> float:
         op = block_ops[i - 1]
         match op:
             case '-':
-                continue
+                if i + 1 == len(block_nums) or block_ops[i] in {'-', '+'}:
+                    total -= next
             case '+':
-                if i + 1 == len(block_nums) or block_ops[i] != '^':
+                if i + 1 == len(block_nums) or block_ops[i] in {'-', '+'}:
                     total += next
             case '*':
-                continue
+                if i + 1 == len(block_nums) or block_ops[i] != '^':
+                    total *= next
             case '\u00f7':
-                continue
+                if i + 1 == len(block_nums) or block_ops[i] != '^':
+                    total /= next
             case '^':
-                continue
+                total = total ** next
+    if total.is_integer():
+        total = int(total)
     return total
 
 def unifier(x: str) -> float:

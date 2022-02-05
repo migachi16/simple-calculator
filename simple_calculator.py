@@ -119,7 +119,7 @@ while True:
                 window['-EQL-'].update(answer) # Display the answer
                 continue
             else:
-                psg.popup_no_wait('Your parentheses do not match!')
+                psg.popup_no_wait('Your parentheses do not match, or your decimal points are meaningless!')
         case 'C':   # Clear
             expression = ''
         case 'ANS': 
