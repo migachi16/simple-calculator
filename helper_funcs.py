@@ -11,7 +11,6 @@ def check_parentheses(x: str) -> bool:
     Takes the expression as input. Checks whether parentheses match correctly. If so, parse the expression.
     """
     global nums, operators, left_par_idx, right_par_idx
-    valid = True
     left = 0
     right = 0
     for char in x:
@@ -54,15 +53,27 @@ def execute(start_pos: int, end_pos: int) -> float:
             case '-':
                 if i + 1 == len(block_nums) or block_ops[i] in {'-', '+'}:
                     total -= next
+                else:
+                    total -= execute(i, end_pos)
+                    break
             case '+':
                 if i + 1 == len(block_nums) or block_ops[i] in {'-', '+'}:
                     total += next
+                else:
+                    total += execute(i, end_pos)
+                    break
             case '*':
                 if i + 1 == len(block_nums) or block_ops[i] != '^':
                     total *= next
+                else:
+                    total *= execute(i, end_pos)
+                    break
             case '\u00f7':
                 if i + 1 == len(block_nums) or block_ops[i] != '^':
                     total /= next
+                else:
+                    total /= execute(i, end_pos)
+                    break
             case '^':
                 total = total ** next
     if total.is_integer():
@@ -82,7 +93,6 @@ def unifier(x: str) -> float:
     if not len(left_par_idx):
         return execute(0, len(nums))
     total = 0.0
-
     return 0.0
 
 #
