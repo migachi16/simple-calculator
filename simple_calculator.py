@@ -116,7 +116,10 @@ while True:
                 answer = str(hf.unifier(expression)) # Execute the algebraic expression
                 just_solved = True
                 previous_ans = answer
-                window['-EQL-'].update(answer) # Display the answer
+                if len(answer) <= 10 and float(answer).is_integer():
+                    window['-EQL-'].update(int(float(answer))) # Display the answer
+                else:
+                    window['-EQL-'].update(format(float(answer), '.9E')) # Display the answer
                 continue
             else:
                 psg.popup_no_wait('Your parentheses do not match, or your decimal points are meaningless!')

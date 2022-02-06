@@ -41,7 +41,7 @@ def check_parentheses(x: str) -> bool:
 
 def execute(start_pos: int, end_pos: int) -> float:
     """
-    Evaluation of basic calculation blocks, sans parentheses. Called only by 'unifier'
+    Recursive evaluation of basic calculation blocks, sans parentheses. Called only by 'unifier'
     """
     block_nums = list(map(float, nums[start_pos : end_pos]))    # New nums and operators lists, specific to the block
     block_ops = operators[start_pos : end_pos - 1]
@@ -76,8 +76,6 @@ def execute(start_pos: int, end_pos: int) -> float:
                     break
             case '^':
                 total = total ** next
-    if total.is_integer():
-        total = int(total)
     return total
 
 def unifier(x: str) -> float:
