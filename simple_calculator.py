@@ -1,6 +1,12 @@
 import PySimpleGUI as psg
 import helper_funcs as hf
 
+event, values = psg.Window('Login Window',
+                  [[psg.T('Enter your Login ID'), psg.In(key='-ID-')],
+                  [psg.B('OK'), psg.B('Cancel') ]]).read(close=True)
+
+login_id = values['-ID-']
+
 nums = '0123456789'
 
 psg.theme('TealMono')
@@ -42,6 +48,8 @@ layout =    [
 
 window =    psg.Window(title, layout, alpha_channel = 0.85, return_keyboard_events = True, 
                 right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
+
+user_verified = False
 
 expression = ''
 previous_ans = ''

@@ -1,7 +1,12 @@
-# simple-calculator
+# a-most-simple-calculator
 
-Current Stage: Initial button implementation and calculator functionality
+Driven by my desire to have an as pure, inclusive, and comprehensive as possible collection of mathematical methods, A Most Simple Calculator (AMSC) boasts, will boast, or has boasted the following (IP: In progress; P: Planned; *: Complete):
 
-A calculator program built using PySimpleGui, numpy, and matplotlib. Implementation of all arithmetic functions, as well as ............. , functional graphing, matrix algebra, trigonometry, .........
-
-Features a simple login system with password encryption, for ultra-safe top secret thingies!
+    - Basic and modular arithmetic [*], with support for parentheses [*]
+    - Registration / login system [IP]
+    - Settings and layouts, per user setting customization [P]
+    - Reliance on numpy / scipy [P]
+    - Linear algebra [P]
+    - Function graphing and analysis [P]
+    - Physics equations with diagrams and notes [P]
+    - ... More!
