@@ -6,7 +6,7 @@ IP: In progress
 P: Planned
 *: Complete
 
-- Basic and modular arithmetic [*], with support for parentheses [*]
+- Basic and modular arithmetic [/*], with support for parentheses [/*]
 - Registration / login system [IP]
 - Settings and layouts, per user setting customization [P]
 - Reliance on numpy / scipy [P]
