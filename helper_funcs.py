@@ -1,20 +1,23 @@
 import decimal
 import re
+import numpy as np
+import scipy as sp
 
-left_par_idx = []   # Lists of parenthesis indices
+left_par_idx = []       # Lists of parenthesis indices
 right_par_idx = []
-nums = []   # A list of all the numbers in the expression
-operators = ''  # A string of all the operators in the expression
+nums = []       # A list of all the numbers in the expression
+operators = ''      # A string of all the operators in the expression
 
 def check_parentheses(x: str) -> bool:
-    """
-    Takes the expression as input. Checks whether parentheses match correctly. If so, parse the expression.
+    """ Takes the expression as input. Checks whether parentheses 
+    match correctly. If so, parse the expression into numbers and 
+    the operators between them
     """
     global nums, operators, left_par_idx, right_par_idx
     left = 0
     right = 0
     for char in x:
-        if right > left:    # An expression is invalid if this is true at any point in the loop
+        if right > left:
             return False
         if char == '(':
             left += 1
@@ -40,11 +43,11 @@ def check_parentheses(x: str) -> bool:
     return True
 
 def execute(start_pos: int, end_pos: int) -> float:
+    """ Recursive evaluation of basic calculation blocks, 
+    sans parentheses. Called only by 'unifier' 
     """
-    Recursive evaluation of basic calculation blocks, sans parentheses. Called only by 'unifier'
-    """
-    block_nums = list(map(float, nums[start_pos : end_pos]))    # New nums and operators lists, specific to the block
-    block_ops = operators[start_pos : end_pos - 1]
+    block_nums = list(map(float, nums[start_pos : end_pos]))   
+    block_ops = operators[start_pos : end_pos - 1]      # New nums/ops lists
     total = block_nums[0]
     for i in range(1, len(block_nums)):
         next = block_nums[i]
@@ -79,9 +82,7 @@ def execute(start_pos: int, end_pos: int) -> float:
     return total
 
 def unifier(x: str) -> float:
-    """
-    Breaks up the expression into parenthetical segments and evaluates them, bottom up.
-    """
+    """ Breaks up the expression into parenthetical segments and evaluates them, bottom up. """
     print(left_par_idx)
     print(right_par_idx)
     print(operators)
@@ -93,19 +94,16 @@ def unifier(x: str) -> float:
     total = 0.0
     return 0.0
 
-#
-# Tests
-#
-
-st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
-sta = '12.1*623^23\u00f72-33+1'
-check_parentheses(sta)
-
-#a = ')(121)(' # False
-#b = '()()()9()' # True
-#c = '(1(12(3)*3)+21(23*2))' # True
-#d = '()(12))(' # False
-#print(check_parentheses(a))
-#print(check_parentheses(b))
-#print(check_parentheses(c))
-#print(check_parentheses(d))
+if __name__ == '__main__':
+    st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
+    sta = '12.1*623^23\u00f72-33+1'
+    check_parentheses(sta)
+    
+    #a = ')(121)(' # False
+    #b = '()()()9()' # True
+    #c = '(1(12(3)*3)+21(23*2))' # True
+    #d = '()(12))(' # False
+    #print(check_parentheses(a))
+    #print(check_parentheses(b))
+    #print(check_parentheses(c))
+    #print(check_parentheses(d))

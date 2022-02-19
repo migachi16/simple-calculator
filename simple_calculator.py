@@ -1,21 +1,40 @@
+import os
 import PySimpleGUI as psg
 import helper_funcs as hf
-
-event, values = psg.Window('Login Window',
-                  [[psg.T('Enter your Login ID'), psg.In(key='-ID-')],
-                  [psg.B('OK'), psg.B('Cancel') ]]).read(close=True)
-
-login_id = values['-ID-']
-
-nums = '0123456789'
 
 psg.theme('TealMono')
 psg.set_options(font = ("Fira Code", 14))
 
-title = 'Simple Calculator'
+NUMS = '0123456789'
+TITLE = 'Simple Calculator'
 
-# TODO 
-#   Implement
+# Initial login/registry window
+layout = [
+            [psg.T('Enter your Login ID or register'), psg.In(key = '-ID-')],          
+            [psg.B('OK', bind_return_key = True), psg.B('Exit'), psg.B('Register') ]
+         ]
+
+window = psg.Window('Authentication', layout, return_keyboard_events = True)
+
+while True:   
+    event, values = window.read()
+
+    if event is psg.WIN_CLOSED or event == 'Exit':
+        break
+
+    login_id = values['-ID-']
+    match event:
+        case 'OK':
+            break
+        case 'Register':
+            break
+
+window.close()
+
+# Main calculator window
+
+#TODO
+# Top bar, left tab menu
 menu_def =  [
                 ['File', ['Save log', 'Clear log', 'Reset', 'Quit',]],
                 ['Help', ['About',]]
@@ -23,22 +42,20 @@ menu_def =  [
 
 layout =    [
 
-                [psg.T('Input an algebraic expression with the buttons or the keyboard.'), psg.Push()], 
+                [psg.T('Input an algebraic expression with the buttons or the keyboard.'),
+                    psg.Push()], 
                 
                 [psg.Menu(menu_def)],
-
                 [psg.In(key = '-EXP-')],
                 
                 [psg.VPush()],
 
-                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+'),psg.Push(), psg.Push(), psg.B('ANS')],
-                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-'), psg.Push(), psg.Push()],
-                [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*'), psg.Push(), psg.Push()],
-
-                [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7'), psg.Push(), psg.Push()],
-
-                [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True), 
-                    psg.Push(), psg.Push(), psg.B('Show Log')],
+                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+'),psg.Push(), psg.B('ANS')],
+                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-'), psg.Push()],
+                [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*'), psg.Push()],
+                [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7'), psg.Push()],
+                [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True, 
+                    bind_return_key = True), psg.Push(), psg.B('Show Log')],
 
                 [psg.VPush()],
 
@@ -46,18 +63,17 @@ layout =    [
                 
             ]
 
-window =    psg.Window(title, layout, alpha_channel = 0.85, return_keyboard_events = True, 
-                right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
+window = psg.Window(TITLE, layout, alpha_channel = 0.85, return_keyboard_events = True, 
+         right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
 
 user_verified = False
 
 expression = ''
 previous_ans = ''
+history = []        # Log button brings up a log of previous calculations stored here
 just_solved = False
 
-"""
-Main window event loop
-"""
+# Main window loop
 while True:
     event, vals = window.read()
     a = len(expression)
@@ -118,7 +134,7 @@ while True:
             if len(expression) == 0:
                 continue 
             expression = expression[:-1]
-        case '=' | 'Return':
+        case '=':
             valid = hf.check_parentheses(expression)    # Parentheses matching
             if valid:
                 answer = str(hf.unifier(expression)) # Execute the algebraic expression
@@ -133,6 +149,7 @@ while True:
                 psg.popup_no_wait('Your parentheses do not match, or your decimal points are meaningless!')
         case 'C':   # Clear
             expression = ''
+            window['-EXP-'].update(expression)
         case 'ANS': 
             expression += previous_ans
 
@@ -142,3 +159,4 @@ while True:
     window['-EXP-'].update(expression)
 
 window.close()
+
