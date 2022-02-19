@@ -5,7 +5,7 @@ import helper_funcs as hf
 psg.theme('TealMono')
 psg.set_options(font = ("Fira Code", 14))
 
-NUMS = '0123456789Ee\u03c0'
+NUMS = '()^*0123456789Ee\u03c0'
 TITLE = 'Simple Calculator'
 
 user_verified = False
@@ -36,7 +36,7 @@ window.close()
 
 # Main calculator window
 
-#TODO
+# TODO
 # Top bar, left tab menu
 menu_def =  [
                 ['File', ['Save log', 'Clear log', 'Reset', 'Quit',]],
@@ -109,17 +109,9 @@ while True:
         case '-' | 'minus':
             expression += '-'
         case '\u00f7' | 'slash' | '/':
-            expression += '\u00f7'
-        case '*':
-            expression += '*'    
+            expression += '\u00f7'    
         case '.' | 'period':
-            expression += '.'    
-        case '^':
-            expression += '^'    
-        case '(':
-            expression += '('   
-        case ')':
-            expression += ')'   
+            expression += '.'       
         case 'BackSpace':
             if expression == '':
                 continue 
@@ -127,7 +119,6 @@ while True:
         #case 'sin':
         #case 'cos':
         #case 'tan':
-
         case '=':
             if expression == '':
                 continue
@@ -151,12 +142,14 @@ while True:
                 elif len(answer) <= 10:
                     window['-EQL-'].update(float(answer))
                 else:
-                    window['-EQL-'].update(format(float(answer), '.9E')) # Scientific notation
+                    # TODO
+                    # Cleaner scientific notation processing needed
+                    window['-EQL-'].update(format(float(answer), '.9E'))
                 continue
             else:
                 psg.popup_no_wait('Your parentheses do not match, or you must check for invalid symbols.')
 
-        case 'C':   # Clear
+        case 'C':
             expression = ''
             window['-EXP-'].update(expression)
         case 'ANS': 

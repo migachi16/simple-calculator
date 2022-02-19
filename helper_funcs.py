@@ -113,13 +113,12 @@ def unifier(x: str) -> float:
     return 0.0
 
 
-def history_list(history: dict) -> str:
+def history_list(history):
     """ Converts and reformats the history dictionary of previous calculations
     into a more readable format for the Show Log popup"""
     hist = str(history)
-
-
-
+    hist = hist.replace('\'', '').replace('{', '').replace('}', '')
+    hist = hist.replace(',', '\n').replace(':', ' = \n\t')
     return hist
 
 
@@ -127,7 +126,8 @@ if __name__ == '__main__':
     st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
     sta = '12.1*623^23\u00f72-33+1'
     check_parentheses(sta)
-    
+    d = {'12341*9': '111069.0', '111069.0*9': '999621.0', '999621.0÷8': '124952.625', '124952.625-645': '124307.625'}
+    print(history_list(d))
     #sta correctly evaluates to 1.1349597 * 10^65  ||||  2/19/22
 
     #a = ')(121)(' # False
