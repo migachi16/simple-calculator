@@ -89,31 +89,14 @@ while True:
                                             '\u00f7', 'slash', '/', '*', '^'}:  # Input of operator following a calculated output
         expression = previous_ans
 
+    if event in NUMS:
+        expression += event
+
     match event:
         case 'Edit Me':
             psg.execute_editor(__file__)
         case 'Version': 
             psg.popup_scrolled(psg.get_versions())
-        case '1':
-            expression += '1'
-        case '2':
-            expression += '2'  
-        case '3':
-            expression += '3'
-        case '4':
-            expression += '4' 
-        case '5':
-            expression += '5'
-        case '6':
-            expression += '6'
-        case '7':
-            expression += '7'
-        case '8':
-            expression += '8' 
-        case '9':
-            expression += '9'
-        case '0':
-            expression += '0'    
         case '+' | 'plus':
             expression += '+'
         case '-' | 'minus':
@@ -135,7 +118,10 @@ while True:
                 continue 
             expression = expression[:-1]
         case '=':
-            valid = hf.check_parentheses(expression)    # Parentheses matching
+            if expression == '':
+                continue
+            valid = hf.check_parentheses(expression)
+
             if valid:
                 answer = str(hf.unifier(expression)) # Execute the algebraic expression
                 just_solved = True
@@ -146,7 +132,8 @@ while True:
                     window['-EQL-'].update(format(float(answer), '.9E')) # Display the answer
                 continue
             else:
-                psg.popup_no_wait('Your parentheses do not match, or your decimal points are meaningless!')
+                psg.popup_no_wait('Your parentheses do not match, or check for invalid symbols.')
+
         case 'C':   # Clear
             expression = ''
             window['-EXP-'].update(expression)
