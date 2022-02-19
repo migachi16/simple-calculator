@@ -5,8 +5,10 @@ import helper_funcs as hf
 psg.theme('TealMono')
 psg.set_options(font = ("Fira Code", 14))
 
-NUMS = '0123456789'
+NUMS = '0123456789Ee\u03c0'
 TITLE = 'Simple Calculator'
+
+user_verified = False
 
 # Initial login/registry window
 layout = [
@@ -25,6 +27,7 @@ while True:
     login_id = values['-ID-']
     match event:
         case 'OK':
+            user_verified = True
             break
         case 'Register':
             break
@@ -42,7 +45,7 @@ menu_def =  [
 
 layout =    [
 
-                [psg.T('Input an algebraic expression with the buttons or the keyboard.'),
+                [psg.T('Input an algebraic expression with buttons or the keyboard.'),
                     psg.Push()], 
                 
                 [psg.Menu(menu_def)],
@@ -50,8 +53,10 @@ layout =    [
                 
                 [psg.VPush()],
 
-                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+'),psg.Push(), psg.B('ANS')],
-                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-'), psg.Push()],
+                [psg.B('1'), psg.B('2'), psg.B('3'), psg.B('+'), psg.Push(), psg.B('E'),
+                    psg.B('sin'), psg.B('cos'), psg.B('tan'), psg.Push(), psg.B('ANS')],
+                [psg.B('4'), psg.B('5'), psg.Button('6'), psg.B('-'), psg.Push(),
+                    psg.B('e'), psg.B('\u03c0'), psg.Push()],
                 [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*'), psg.Push()],
                 [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7'), psg.Push()],
                 [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True, 
@@ -63,31 +68,33 @@ layout =    [
                 
             ]
 
-window = psg.Window(TITLE, layout, alpha_channel = 0.85, return_keyboard_events = True, 
+window = psg.Window(TITLE, layout, alpha_channel = 0.9, return_keyboard_events = True, 
          right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
 
-user_verified = False
+if not user_verified:       # Top secret stuff!
+    window.close() 
 
 expression = ''
 previous_ans = ''
-history = []        # Log button brings up a log of previous calculations stored here
+history = {}        # Log button brings up a log of previous calculations stored here
 just_solved = False
 
 # Main window loop
 while True:
     event, vals = window.read()
-    a = len(expression)
+    check_len = len(expression)
 
     if event is psg.WIN_CLOSED or event == 'Exit':
         break
 
     if ':' in event:
-        idx = event.index(':')
-        event = event[:-(len(event) - idx)] # Extended keyboard input handling for the form xxx:#
+        idx = event.index(':')      # Extended keyboard input handling for the form xxx:#
+        event = event[:-(len(event) - idx)] 
 
-    if just_solved is True and event in {'+', 'plus', '-', 'minus', 
-                                            '\u00f7', 'slash', '/', '*', '^'}:  # Input of operator following a calculated output
-        expression = previous_ans
+    if just_solved is True and event in {'+', 'plus', '-', 'minus', '\u00f7', 'slash',
+            '/', '*', '^'}:  
+
+        expression = previous_ans       # Input of operator following a calculated output
 
     if event in NUMS:
         expression += event
@@ -114,34 +121,52 @@ while True:
         case ')':
             expression += ')'   
         case 'BackSpace':
-            if len(expression) == 0:
+            if expression == '':
                 continue 
             expression = expression[:-1]
+        #case 'sin':
+        #case 'cos':
+        #case 'tan':
+
         case '=':
             if expression == '':
                 continue
+
             valid = hf.check_parentheses(expression)
 
             if valid:
-                answer = str(hf.unifier(expression)) # Execute the algebraic expression
+                answer = hf.unifier(expression)         # Execute the algebraic expression
+
+                if answer is None:
+                    psg.popup_no_wait('You tried to divide by 0.')
+                    continue
+
+                answer = str(answer)  
                 just_solved = True
                 previous_ans = answer
+                history[expression] = answer
+
                 if len(answer) <= 10 and float(answer).is_integer():
-                    window['-EQL-'].update(int(float(answer))) # Display the answer
+                    window['-EQL-'].update(int(float(answer)))
+                elif len(answer) <= 10:
+                    window['-EQL-'].update(float(answer))
                 else:
-                    window['-EQL-'].update(format(float(answer), '.9E')) # Display the answer
+                    window['-EQL-'].update(format(float(answer), '.9E')) # Scientific notation
                 continue
             else:
-                psg.popup_no_wait('Your parentheses do not match, or check for invalid symbols.')
+                psg.popup_no_wait('Your parentheses do not match, or you must check for invalid symbols.')
 
         case 'C':   # Clear
             expression = ''
             window['-EXP-'].update(expression)
         case 'ANS': 
             expression += previous_ans
+        case 'Show Log':
+            psg.popup_scrolled(hf.history_list(history))
 
-    if just_solved and len(expression) != a:
-        just_solved = False
+
+    if just_solved and len(expression) != check_len:
+        just_solved = False         
 
     window['-EXP-'].update(expression)
 
