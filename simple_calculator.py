@@ -45,7 +45,6 @@ while True:
             match code:
                 case 'IDExist':
                     psg.popup('This ID is already registered')
-                    continue
                 case 'Invalid':
                     psg.popup('You must first fill out the form')
                 case ',':
@@ -54,8 +53,6 @@ while True:
                     psg.popup('Invalid email address')
                 case 'Success':
                     psg.popup('Account successfully created. Please restart and login')
-                    continue
-            continue
 
 window.close()
 
@@ -99,7 +96,7 @@ if not user_verified:       # Top secret stuff!
 
 expression = ''
 previous_ans = ''
-history = {}        # Log button brings up a log of previous calculations stored here
+history = {}        # Show Log button brings up a log of previous calculations stored here
 just_solved = False
 
 # Main window loop
@@ -178,7 +175,7 @@ while True:
         case 'ANS': 
             expression += previous_ans
         case 'Show Log':
-            psg.popup_scrolled('Memory', hf.history_list(history))
+            psg.popup_scrolled(hf.history_list(history), title = 'Memory')
 
 
     if just_solved and len(expression) != check_len:

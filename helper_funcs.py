@@ -54,7 +54,9 @@ def check_parentheses(x: str) -> bool:
 
 def execute(start_pos: int, end_pos: int) -> float:
     """ Recursive evaluation of basic calculation blocks, 
-    sans parentheses. Called only by 'unifier' 
+    sans parentheses. Called otherwise only by 'unifier'. 
+    We iterate through the expression, evaluating explicitly
+    only when arithmetic dictates we can
     """
     block_nums = list(map(float, nums[start_pos : end_pos]))   
     block_ops = operators[start_pos : end_pos - 1]      # New nums/ops lists
@@ -133,7 +135,7 @@ def history_list(history):
 def hashed(pw: str) -> str:
     masked = hs.sha256(pw.encode())
     return masked.hexdigest()
-    
+
 
 def login(id: str, pw: str) -> bool:
     a = ('', None)
@@ -173,7 +175,7 @@ def register(id: str, pw: str, email: str) -> str:
     
     pw_hash = hashed(pw)
     new_entry = open(pass_addy, 'a')
-    new_entry.write(id + ',\n' + email + ',\n' + pw_hash + '\n;')
+    new_entry.write(id + ',\n' + email + ',\n' + pw_hash + '\n;\n')
     new_entry.close()
     return 'Success'
         
