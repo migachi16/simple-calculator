@@ -1,11 +1,18 @@
+import os
 import re
+import hashlib as hs
 import numpy as np
 import scipy as sp
+
 
 left_par_idx = []       # Lists of parenthesis indices
 right_par_idx = []
 nums = []       # A list of all the numbers in the expression
 operators = ''      # A string of all the operators in the expression
+curr_dir = os.getcwd()
+pass_addy = curr_dir + '\pass_hashes.txt'
+user_data = (open(pass_addy, 'r')).read()
+
 
 def check_parentheses(x: str) -> bool:
     """ Takes the expression as input. Checks whether parentheses 
@@ -100,7 +107,8 @@ def execute(start_pos: int, end_pos: int) -> float:
 
 
 def unifier(x: str) -> float:
-    """ Breaks up the expression into parenthetical segments and evaluates them, bottom up. """
+    """ Breaks up the expression into parenthetical segments 
+    and evaluates them, bottom up. """
     print(left_par_idx)
     print(right_par_idx)
     print(operators)
@@ -122,12 +130,62 @@ def history_list(history):
     return hist
 
 
+def hashed(pw: str) -> str:
+    masked = hs.sha256(pw.encode())
+    return masked.hexdigest()
+    
+
+def login(id: str, pw: str) -> bool:
+    a = ('', None)
+    if id in a or pw in a or id == 'USERNAME':
+        return False
+    data_list = user_data.split(';')
+    for datum in data_list:
+        entry = datum.replace('\n', '').split(',')
+        if id != entry[0]:
+            continue
+        else:
+            temp = hashed(pw)
+            if temp == entry[2]:
+                return True
+            break
+    return False
+
+
+def register(id: str, pw: str, email: str) -> str:
+    A = ('', None)
+    if id in A or pw in A or email in A or id == 'USERNAME':
+        return 'Invalid'
+
+    if ',' in id:
+        return ','
+
+    if '@' not in email or '.' not in email:
+        return '@'
+
+    data_list = user_data.split(';')
+    for datum in data_list:
+        entry = datum.replace('\n', '').split(',')
+        if id != entry[0]:
+            continue
+        else:
+            return 'IDExist'
+    
+    pw_hash = hashed(pw)
+    new_entry = open(pass_addy, 'a')
+    new_entry.write(id + ',\n' + email + ',\n' + pw_hash + '\n;')
+    new_entry.close()
+    return 'Success'
+        
+
 if __name__ == '__main__':
-    st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
-    sta = '12.1*623^23\u00f72-33+1'
-    check_parentheses(sta)
-    d = {'12341*9': '111069.0', '111069.0*9': '999621.0', '999621.0÷8': '124952.625', '124952.625-645': '124307.625'}
-    print(history_list(d))
+    #st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
+    #sta = '12.1*623^23\u00f72-33+1'
+    #check_parentheses(sta)
+    #d = {'12341*9': '111069.0', '111069.0*9': '999621.0', '999621.0÷8': '124952.625',
+    #    '124952.625-645': '124307.625'}
+    #print(history_list(d))
+
     #sta correctly evaluates to 1.1349597 * 10^65  ||||  2/19/22
 
     #a = ')(121)(' # False
@@ -138,3 +196,9 @@ if __name__ == '__main__':
     #print(check_parentheses(b))
     #print(check_parentheses(c))
     #print(check_parentheses(d))
+
+    login('p', 'p')
+
+    #print(hashed('aaaka'))
+    #print(hashed('taaka'))
+    #print(hashed('aaaka'))

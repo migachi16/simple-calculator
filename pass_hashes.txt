@@ -1,1 +1,8 @@
-USERNAME    |   PASS_HASH
+USERNAME,
+EMAIL,
+PASS_HASH
+;
+themoonwiz,
+mgachi2@illinois.edu,
+1f9f6a2ab3f54ea796d21bce64e88d166d722ed4491ccb2874323a26018e8f52
+;

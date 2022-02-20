@@ -1,4 +1,3 @@
-import os
 import PySimpleGUI as psg
 import helper_funcs as hf
 
@@ -12,25 +11,51 @@ user_verified = False
 
 # Initial login/registry window
 layout = [
-            [psg.T('Enter your Login ID or register'), psg.In(key = '-ID-')],          
-            [psg.B('OK', bind_return_key = True), psg.B('Exit'), psg.B('Register') ]
+            [psg.T('Enter your Login ID and password or register for an account')],   
+            [psg.T('ID: '), psg.Push(), psg.In(key = '-ID-')],    
+            [psg.T('PW: '), psg.Push(), psg.In(key = '-PW-', password_char = '\u2022')], 
+            [psg.T('Email, if registering: '), psg.Push(), psg.In(key = '-EM-')],
+            [psg.VPush()],
+            [psg.B('Register'), psg.Push(), psg.B('Exit'), 
+                psg.B('OK', bind_return_key = True)]
          ]
 
-window = psg.Window('Authentication', layout, return_keyboard_events = True)
+window = psg.Window('Authentication', layout, return_keyboard_events = True, element_justification = 'c')
 
 while True:   
     event, values = window.read()
-
     if event is psg.WIN_CLOSED or event == 'Exit':
         break
 
     login_id = values['-ID-']
+    password = values['-PW-']
+    email = values['-EM-']
+
     match event:
         case 'OK':
-            user_verified = True
-            break
+            user_verified = hf.login(login_id, password)
+            if user_verified is False:
+                psg.popup('Invalid ID or password.')
+                continue
+            else:
+                break
+
         case 'Register':
-            break
+            code = hf.register(login_id, password, email)
+            match code:
+                case 'IDExist':
+                    psg.popup('This ID is already registered')
+                    continue
+                case 'Invalid':
+                    psg.popup('You must first fill out the form')
+                case ',':
+                    psg.popup('Invalid comma in Password')
+                case '@':
+                    psg.popup('Invalid email address')
+                case 'Success':
+                    psg.popup('Account successfully created. Please restart and login')
+                    continue
+            continue
 
 window.close()
 
@@ -44,7 +69,6 @@ menu_def =  [
             ]
 
 layout =    [
-
                 [psg.T('Input an algebraic expression with buttons or the keyboard.'),
                     psg.Push()], 
                 
@@ -64,8 +88,7 @@ layout =    [
 
                 [psg.VPush()],
 
-                [psg.T('Result:'), psg.Txt(key = '-EQL-'), psg.Push(), psg.B('Exit')]
-                
+                [psg.T('Result:'), psg.Txt(key = '-EQL-'), psg.Push(), psg.B('Exit')]     
             ]
 
 window = psg.Window(TITLE, layout, alpha_channel = 0.9, return_keyboard_events = True, 
@@ -155,7 +178,7 @@ while True:
         case 'ANS': 
             expression += previous_ans
         case 'Show Log':
-            psg.popup_scrolled(hf.history_list(history))
+            psg.popup_scrolled('Memory', hf.history_list(history))
 
 
     if just_solved and len(expression) != check_len:
