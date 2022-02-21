@@ -12,6 +12,7 @@ operators = ''      # A string of all the operators in the expression
 curr_dir = os.getcwd()
 pass_addy = curr_dir + '\pass_hashes.txt'
 user_data = (open(pass_addy, 'r')).read()
+A = ('', None)
 
 
 def check_parentheses(x: str) -> bool:
@@ -138,8 +139,7 @@ def hashed(pw: str) -> str:
 
 
 def login(id: str, pw: str) -> bool:
-    a = ('', None)
-    if id in a or pw in a or id == 'USERNAME':
+    if id in A or pw in A or id == 'USERNAME':
         return False
     data_list = user_data.split(';')
     for datum in data_list:
@@ -155,7 +155,6 @@ def login(id: str, pw: str) -> bool:
 
 
 def register(id: str, pw: str, email: str) -> str:
-    A = ('', None)
     if id in A or pw in A or email in A or id == 'USERNAME':
         return 'Invalid'
 
@@ -175,7 +174,7 @@ def register(id: str, pw: str, email: str) -> str:
     
     pw_hash = hashed(pw)
     new_entry = open(pass_addy, 'a')
-    new_entry.write(id + ',\n' + email + ',\n' + pw_hash + '\n;\n')
+    new_entry.write(id + ',\n' + email + ',\n' + pw_hash + '\n; \n')
     new_entry.close()
     return 'Success'
         
