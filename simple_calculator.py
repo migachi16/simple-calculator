@@ -136,9 +136,17 @@ while True:
             if expression == '':
                 continue 
             expression = expression[:-1]
-        #case 'sin':
-        #case 'cos':
-        #case 'tan':
+        # TODO
+        case 'sin':
+            pass
+        case 'cos':
+            pass
+        case 'tan':
+            pass
+        case '\u221a':
+            pass
+
+        # TODO
         case '=':
             if expression == '':
                 continue
