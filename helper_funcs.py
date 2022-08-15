@@ -10,7 +10,7 @@ right_par_idx = []
 nums = []       # A list of all the numbers in the expression
 operators = ''      # A string of all the operators in the expression
 curr_dir = os.getcwd()
-pass_addy = curr_dir + '\pass_hashes.txt'
+pass_addy = curr_dir + '/pass_hashes.txt'
 user_data = (open(pass_addy, 'r')).read()
 A = ('', None)
 

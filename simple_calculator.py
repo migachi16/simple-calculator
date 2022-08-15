@@ -60,6 +60,7 @@ window.close()
 
 # TODO
 # Top bar, left tab menu
+
 menu_def =  [
                 ['File', ['Save log', 'Clear log', 'Reset', 'Quit',]],
                 ['Help', ['About',]]
@@ -81,7 +82,7 @@ layout =    [
                 [psg.B('7'), psg.B('8'), psg.B('9'), psg.B('*'), psg.Push()],
                 [psg.B('.'), psg.B('0'), psg.B('^'), psg.B('\u00f7'), psg.Push()],
                 [psg.B('('), psg.B('C'), psg.B(')'), psg.B('=', enable_events = True, 
-                    bind_return_key = True), psg.Push(), psg.B('Show Log')],
+                    bind_return_key = True), psg.Push(), psg.B('Memory')],
 
                 [psg.VPush()],
 
@@ -89,14 +90,14 @@ layout =    [
             ]
 
 window = psg.Window(TITLE, layout, alpha_channel = 0.9, return_keyboard_events = True, 
-         right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT)
+         right_click_menu = psg.MENU_RIGHT_CLICK_EDITME_VER_EXIT, size = (1250, 650))
 
 if not user_verified:       # Top secret stuff!
     window.close() 
 
 expression = ''
 previous_ans = ''
-history = {}        # Show Log button brings up a log of previous calculations stored here
+history = {}        # Memory button brings up a log of previous calculations stored here
 just_solved = False
 
 # Main window loop
@@ -182,7 +183,7 @@ while True:
             window['-EXP-'].update(expression)
         case 'ANS': 
             expression += previous_ans
-        case 'Show Log':
+        case 'Memory':
             psg.popup_scrolled(hf.history_list(history), title = 'Memory')
 
 
