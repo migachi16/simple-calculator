@@ -1,5 +1,5 @@
 import PySimpleGUI as psg
-import helper_funcs as hf
+import src.helper_funcs as hf
 
 psg.theme('TealMono')
 psg.set_options(font = ("Fira Code", 14))

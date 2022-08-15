@@ -9,8 +9,7 @@ P: Planned
 - Basic and modular arithmetic [\*], with support for parentheses [\*]
 - Registration / login system [\*]
 - Settings and layouts, per user setting customization [P]
-- Reliance on numpy / scipy [P]
-- Linear algebra [P]
+- Linear algebra with scipy [P]
 - Function graphing and analysis [P]
 - Physics equations with diagrams/animations [P]
 - ... More!
