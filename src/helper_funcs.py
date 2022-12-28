@@ -7,19 +7,26 @@ import scipy as sp
 
 left_par_idx = []       # Lists of parenthesis indices
 right_par_idx = []
-nums = []       # A list of all the numbers in the expression
-operators = ''      # A string of all the operators in the expression
-curr_dir = os.getcwd()
-pass_addy = curr_dir + '/pass_hashes.txt'
+nums = []               # A list of all the numbers in the expression
+operators = ''          # A string of all the operators in the expression
+
+curr_dir = os.getcwd()  # Current directory
+
+# Find and read user login ID's and password hashes
+pass_addy = os.path.dirname(curr_dir) + '/pass_hashes.txt'  
 user_data = (open(pass_addy, 'r')).read()
+
+# Empty data reference
 A = ('', None)
 
-
+# TODO
+# Invalid input handling
 def check_parentheses(x: str) -> bool:
     """ Takes the expression as input. Checks whether parentheses 
     match correctly. If so, parse the expression into numbers and 
     the operators between them
     """
+
     global nums, operators, left_par_idx, right_par_idx
     left = 0
     right = 0
@@ -35,12 +42,13 @@ def check_parentheses(x: str) -> bool:
         return False
 
     # All is good -- we may proceed to populate the necessary lists.
-    a = re.split('\(|\)|\*|\^|-|\+|\u00f7', x)
-    b = re.split('[0-9, .]', x)
+    a = re.split('\(|\)|\*|\^|-|\+|\u00f7|\u221a|sin|cos|tan|E', x)
+    b = re.split('[0-9, ., e, \u03c0]', x)
 
     nums = list(filter(None, a))
     for num in nums:
-        if num.count('.') > 1:  # Taking care of multiple decimals
+        # Taking care of multiple decimals
+        if num.count('.') > 1:  
             return False
 
     operators = ''.join(b)
@@ -59,9 +67,14 @@ def execute(start_pos: int, end_pos: int) -> float:
     We iterate through the expression, evaluating explicitly
     only when arithmetic dictates we can
     """
+    # New nums/ops lists
     block_nums = list(map(float, nums[start_pos : end_pos]))   
-    block_ops = operators[start_pos : end_pos - 1]      # New nums/ops lists
-    zero = False        # Division by zero check
+    block_ops = operators[start_pos : end_pos - 1]    
+
+    print(block_nums)
+    print(block_ops)
+    # Division by zero check
+    zero = False        
 
     total = block_nums[0]
     for i in range(1, len(block_nums)):
@@ -112,17 +125,30 @@ def execute(start_pos: int, end_pos: int) -> float:
 def unifier(x: str) -> float:
     """ Breaks up the expression into parenthetical segments 
     and evaluates them, bottom up. """
+
+    global nums, operators, left_par_idx, right_par_idx
+    
     print(left_par_idx)
     print(right_par_idx)
     print(operators)
     print(nums)
+
+    total = 0.0
+
     if len(nums) == 1:
         return nums[0]
     if not len(left_par_idx):
         return execute(0, len(nums))
-    total = 0.0
-    return 0.0
+    #else:
+        
 
+    # Reset the global variables
+    left_par_idx = []       
+    right_par_idx = []
+    nums = []             
+    operators = ''
+
+    return total
 
 def history_list(history):
     """ Converts and reformats the history dictionary of previous calculations
@@ -134,19 +160,26 @@ def history_list(history):
 
 
 def hashed(pw: str) -> str:
+    """ Return the sha256 hashed value of the password """
+
     masked = hs.sha256(pw.encode())
     return masked.hexdigest()
 
 
 def login(id: str, pw: str) -> bool:
+    """ Check to see if the user passed valid login information"""
+
     if id in A or pw in A or id == 'USERNAME':
         return False
+    # Parse through user data
     data_list = user_data.split(';')
     for datum in data_list:
         entry = datum.replace('\n', '').split(',')
+        # Find a matching login ID
         if id != entry[0]:
             continue
         else:
+            # Check for matching password hash 
             temp = hashed(pw)
             if temp == entry[2]:
                 return True
@@ -155,6 +188,8 @@ def login(id: str, pw: str) -> bool:
 
 
 def register(id: str, pw: str, email: str) -> str:
+    """ Register the user for an AMSC account"""
+
     if id in A or pw in A or email in A or id == 'USERNAME':
         return 'Invalid'
 
@@ -167,6 +202,7 @@ def register(id: str, pw: str, email: str) -> str:
     data_list = user_data.split(';')
     for datum in data_list:
         entry = datum.replace('\n', '').split(',')
+        # Check for existing login ID
         if id != entry[0]:
             continue
         else:
