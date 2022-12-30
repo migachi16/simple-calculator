@@ -21,11 +21,14 @@ user_data = (open(pass_addy, 'r')).read()
 A = ('', None)
 
 def evaluate(expression: list) -> float:
+    """ Try to evaluate the expression. Returns a successful result as a float or raises
+    exceptions for invalid expressions """
+
     try:
-        one = ''.join(expression)
-        answer = eval(one)
+        expression_string = ''.join(expression)
+        answer = eval(expression_string)
         return float(answer)
-    except(TypeError):
+    except(TypeError, SyntaxError):
         return '!!!'
     except(ZeroDivisionError):
         return None

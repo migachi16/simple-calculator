@@ -133,9 +133,12 @@ window = psg.Window(TITLE, layout, alpha_channel = 0.85, return_keyboard_events 
 if not user_verified and login_id != 'USERNAME':
     window.close() 
 
+# The expression is showed in the main window.
+# The exp_stack keeps track of the expression in the correct format for evaluation
 expression = ''
 exp_stack = []
 
+# This stack keeps track of parentheses. We append on '(', and pop on ')'
 left_stack = []
 
 previous_ans = ''
