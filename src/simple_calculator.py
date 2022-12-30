@@ -6,8 +6,7 @@ psg.theme('TealMono')
 psg.set_options(font = ("Fira Code", 14))
 
 # Valid inputs
-NUMS = ['(', ')', '^', '*', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E', 'e',
-    '\u03c0',]
+NUMS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 # Window Title
 TITLE = 'A Most Simple Calculator'
@@ -116,12 +115,18 @@ layout =    [
                     psg.B(' \u03c0 '), psg.B('sin'), psg.B('cos'), psg.B('tan'),],
                 
                 [psg.VPush()],
-                
+                [psg.VPush()],
+                [psg.VPush()],
+                [psg.VPush()],
+                [psg.VPush()],
+                [psg.VPush()],
+                [psg.VPush()],
+
                 [psg.B('Memory', tooltip = 'Show a log of the previous calculations'), psg.Push(), psg.B('Exit')]     
             ]
 
 window = psg.Window(TITLE, layout, alpha_channel = 0.85, return_keyboard_events = True, 
-    size = (1250, 650))
+    size = (1600, 900))
 
 # TODO 
 # Handle user settings
@@ -129,6 +134,10 @@ if not user_verified and login_id != 'USERNAME':
     window.close() 
 
 expression = ''
+exp_stack = []
+
+left_stack = []
+
 previous_ans = ''
 
 # Memory button brings up a log of previous calculations stored in history
@@ -139,7 +148,7 @@ just_solved = False
 # Main window loop
 while True:
     event, vals = window.read()
-    check_len = len(expression)
+    check_len = len(expression) 
 
     if event is psg.WIN_CLOSED or event == 'Exit':
         break
@@ -155,53 +164,110 @@ while True:
             '/', '*', '^'}:  
         
         # Input of operator following a calculated output
-        expression = previous_ans       
+        expression = previous_ans   
+        exp_stack.append(previous_ans)    
 
     if event in NUMS:
+        exp_stack.append(event)
         expression += event
 
     match event:
+        case '(':
+            left_stack.append(1)
+            exp_stack.append('(')
+            expression += '('
+        case ')':
+            if(left_stack):
+                left_stack.pop()
+                exp_stack.append(')')
+                expression += ')'
+            else:
+                psg.popup_no_wait('You must open a parenthesis first!')
+                continue
+        case '^':
+            left_stack.append(1)
+            exp_stack.append('**(')
+            expression += '^('
+        case '*':
+            exp_stack.append('*')
+            expression += '*'
         case '+' | 'plus':
+            exp_stack.append('+')
             expression += '+'
         case '-' | 'minus':
+            exp_stack.append('-')
             expression += '-'
         case '\u00f7' | 'slash' | '/':
+            exp_stack.append('/')
             expression += '\u00f7'    
         case '.' | 'period':
+            exp_stack.append('.')
             expression += '.'       
         case 'BackSpace' | 'Del':
             if expression == '':
                 continue 
-            expression = expression[:-1]
-        # TODO
+            else:
+                exp_stack.pop()
+                expression = expression[:-1]
+        case 'E':
+            exp_stack.append('*10**')
+            expression += 'E'
+        case 'e':
+            exp_stack.append('math.e')
+            expression += 'e'
+        case '\u03c0':
+            exp_stack.append('math.pi')
+            expression += '\u03c0'
         case 'sin':
+            left_stack.append(1)
+            exp_stack.append('math.sin(')
             expression += 'sin('
         case 'cos':
+            left_stack.append(1)
+            exp_stack.append('math.cos(')
             expression += 'cos('
         case 'tan':
+            left_stack.append(1)
+            exp_stack.append('math.tan(')
             expression += 'tan('
         case '\u221a':
+            left_stack.append(1)
+            exp_stack.append('math.sqrt(')
             expression += '\u221a('
 
         # TODO
         case '=':
-            if expression == '':
+            if expression == '' or just_solved:
                 continue
 
-            valid = hf.check_parentheses(expression)
+            # Check if the parentheses in the expression are matching and valid
+            valid = not left_stack
 
             if valid:
                 # Execute the algebraic expression
-                answer = hf.unifier(expression)         
+                answer = hf.evaluate(exp_stack)         
 
                 if answer is None:
-                    psg.popup_no_wait('You tried to divide by 0.')
+                    psg.popup_no_wait('You tried to divide by 0!')
                     continue
+
+                if answer == '!!!':
+                    psg.popup_no_wait('Your expression is invalid!')
+                    continue
+
+                if answer == '???':
+                    psg.popup_no_wait('The result is undefined')
+                    continue
+
+                if answer <= (1.23e-16) and answer >= 0:
+                    answer = 0
 
                 answer = str(answer)  
                 just_solved = True
                 previous_ans = answer
                 history[expression] = answer
+                exp_stack = []
+                left_stack = []
 
                 if len(answer) <= 10 and float(answer).is_integer():
                     window['-EQL-'].update(int(float(answer)))
@@ -217,8 +283,11 @@ while True:
 
         case 'C':
             expression = ''
+            exp_stack = []
+            left_stack = []
             window['-EXP-'].update(expression)
         case 'Ans': 
+            exp_stack.append(previous_ans)
             expression += previous_ans
         case 'Memory':
             psg.popup_scrolled(hf.history_list(history), title = 'Memory')
@@ -228,6 +297,7 @@ while True:
         just_solved = False         
 
     window['-EXP-'].update(expression)
+    print(exp_stack)
 
 window.close()
 

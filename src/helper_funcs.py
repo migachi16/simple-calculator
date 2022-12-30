@@ -3,6 +3,7 @@ import re
 import hashlib as hs
 import numpy as np
 import scipy as sp
+import math
 
 
 left_par_idx = []       # Lists of parenthesis indices
@@ -19,136 +20,17 @@ user_data = (open(pass_addy, 'r')).read()
 # Empty data reference
 A = ('', None)
 
-# TODO
-# Invalid input handling
-def check_parentheses(x: str) -> bool:
-    """ Takes the expression as input. Checks whether parentheses 
-    match correctly. If so, parse the expression into numbers and 
-    the operators between them
-    """
-
-    global nums, operators, left_par_idx, right_par_idx
-    left = 0
-    right = 0
-
-    for char in x:
-        if right > left:
-            return False
-        if char == '(':
-            left += 1
-        elif char == ')':
-            right += 1
-    if left != right:
-        return False
-
-    # All is good -- we may proceed to populate the necessary lists.
-    a = re.split('\(|\)|\*|\^|-|\+|\u00f7|\u221a|sin|cos|tan|E', x)
-    b = re.split('[0-9, ., e, \u03c0]', x)
-
-    nums = list(filter(None, a))
-    for num in nums:
-        # Taking care of multiple decimals
-        if num.count('.') > 1:  
-            return False
-
-    operators = ''.join(b)
-    for idx, op in enumerate(operators):
-        if op == '(':
-            left_par_idx.append(idx)
-        if op == ')':
-            right_par_idx.append(idx)
-
-    return True
-
-
-def execute(start_pos: int, end_pos: int) -> float:
-    """ Recursive evaluation of basic calculation blocks, 
-    sans parentheses. Called otherwise only by 'unifier'. 
-    We iterate through the expression, evaluating explicitly
-    only when arithmetic dictates we can
-    """
-    # New nums/ops lists
-    block_nums = list(map(float, nums[start_pos : end_pos]))   
-    block_ops = operators[start_pos : end_pos - 1]    
-
-    print(block_nums)
-    print(block_ops)
-    # Division by zero check
-    zero = False        
-
-    total = block_nums[0]
-    for i in range(1, len(block_nums)):
-        next = block_nums[i]
-        op = block_ops[i - 1]
-
-        match op:
-            case '-':
-                if i + 1 == len(block_nums) or block_ops[i] in {'-', '+'}:
-                    total -= next
-                else:
-                    total -= execute(i, end_pos)
-                    break
-
-            case '+':
-                if i + 1 == len(block_nums) or block_ops[i] in {'-', '+'}:
-                    total += next
-                else:
-                    total += execute(i, end_pos)
-                    break
-
-            case '*':
-                if i + 1 == len(block_nums) or block_ops[i] != '^':
-                    total *= next
-                else:
-                    total *= execute(i, end_pos)
-                    break
-
-            case '\u00f7':
-                if i + 1 == len(block_nums) or block_ops[i] != '^':
-                    try: 
-                        total /= next
-                    except(ZeroDivisionError):
-                        zero = True
-                        break
-                else:
-                    total /= execute(i, end_pos)
-                    break
-
-            case '^':
-                total = total ** next
-
-    if zero:
-        total = None
-    return total
-
-
-def unifier(x: str) -> float:
-    """ Breaks up the expression into parenthetical segments 
-    and evaluates them, bottom up. """
-
-    global nums, operators, left_par_idx, right_par_idx
-    
-    print(left_par_idx)
-    print(right_par_idx)
-    print(operators)
-    print(nums)
-
-    total = 0.0
-
-    if len(nums) == 1:
-        return nums[0]
-    if not len(left_par_idx):
-        return execute(0, len(nums))
-    #else:
-        
-
-    # Reset the global variables
-    left_par_idx = []       
-    right_par_idx = []
-    nums = []             
-    operators = ''
-
-    return total
+def evaluate(expression: list) -> float:
+    try:
+        one = ''.join(expression)
+        answer = eval(one)
+        return float(answer)
+    except(TypeError):
+        return '!!!'
+    except(ZeroDivisionError):
+        return None
+    except(ValueError):
+        return '???'
 
 def history_list(history):
     """ Converts and reformats the history dictionary of previous calculations
@@ -218,6 +100,8 @@ def register(id: str, pw: str, email: str) -> str:
 if __name__ == '__main__':
     #st = '(12.1*623^23)\u00f72-33+1'   # Should be evaluated to ~1.1349597 * 10^65
     #sta = '12.1*623^23\u00f72-33+1'
+    #st = '(2+80)*(3**(74-79))'
+    #st = '2 + 5'
     #check_parentheses(sta)
     #d = {'12341*9': '111069.0', '111069.0*9': '999621.0', '999621.0÷8': '124952.625',
     #    '124952.625-645': '124307.625'}
@@ -227,15 +111,23 @@ if __name__ == '__main__':
 
     #a = ')(121)(' # False
     #b = '()()()9()' # True
-    #c = '(1(12(3)*3)+21(23*2))' # True
+    #c = '(1*(12*(3)*3)+21*(23*2))' # True
     #d = '()(12))(' # False
     #print(check_parentheses(a))
     #print(check_parentheses(b))
     #print(check_parentheses(c))
     #print(check_parentheses(d))
 
-    login('p', 'p')
+    #e = 'math.sin(math.e / 2)'
+
+    #login('p', 'p')
 
     #print(hashed('aaaka'))
     #print(hashed('taaka'))
     #print(hashed('aaaka'))
+
+    #b = unifier(st)
+
+    #print(eval(e))
+
+    pass
