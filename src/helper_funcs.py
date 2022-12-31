@@ -20,12 +20,32 @@ user_data = (open(pass_addy, 'r')).read()
 # Empty data reference
 A = ('', None)
 
-def evaluate(expression: list) -> float:
+def evaluate(expression: list, radian: bool = True) -> float:
     """ Try to evaluate the expression. Returns a successful result as a float or raises
     exceptions for invalid expressions """
 
+    # If degrees are selected, we convert the parameters in the trig functions
+    # from radians to degrees
+    if not radian:
+        paren_track = []
+        for i, element in enumerate(expression):
+            if element in ('math.sin(', 'math.cos(', 'math.tan('):
+                expression.insert(i + 1, 'math.radians(')
+                for j in range(i + 2, len(expression)):
+                    if expression[j] in ('math.sin(', 'math.cos(', 'math.tan(', 'math.sqrt(', '('):
+                        paren_track.append(1)
+                    if expression[j] == ')':
+                        try:
+                            paren_track.pop()
+                        except(IndexError):    
+                            expression.insert(j, ')')
+                            break
+
+    print(expression)
+
+    expression_string = ''.join(expression)
+
     try:
-        expression_string = ''.join(expression)
         answer = eval(expression_string)
         return float(answer)
     except(TypeError, SyntaxError):

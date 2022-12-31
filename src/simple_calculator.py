@@ -98,9 +98,13 @@ menu_def =  [
 layout =    [
                 [psg.Menu(menu_def)],
 
-                [psg.T('Input:'), psg.In(key = '-EXP-'), psg.T('Output:'), psg.Txt(key = '-EQL-'), psg.Push()], 
+                [psg.T('Input:'), psg.In(key = '-EXP-'), psg.T('Output:'), psg.Txt(key = '-EQL-'), psg.Push()],     
 
                 [psg.VPush()],
+
+                # Select between radians and degrees for trigonometric functions
+                [psg.Rad('Radians', "Angles", enable_events = True, default = True, key = 'Radians'), 
+                    psg.Rad('Degrees', "Angles", enable_events = True, key = 'Degrees')],
 
                 [psg.B(' 1 '), psg.B(' 2 '), psg.B(' 3 '), psg.B(' + '), psg.B('Del', tooltip = 'Delete the last value'), psg.Push()],
                 [psg.B(' 4 '), psg.B(' 5 '), psg.Button(' 6 '), psg.B(' - '), psg.Push()],
@@ -132,6 +136,10 @@ window = psg.Window(TITLE, layout, alpha_channel = 0.85, return_keyboard_events 
 # Handle user settings
 if not user_verified and login_id != 'USERNAME':
     window.close() 
+
+# Check if degrees or radians are selected
+
+radian = True
 
 # The expression is showed in the main window.
 # The exp_stack keeps track of the expression in the correct format for evaluation
@@ -238,7 +246,6 @@ while True:
             exp_stack.append('math.sqrt(')
             expression += '\u221a('
 
-        # TODO
         case '=':
             if expression == '' or just_solved:
                 continue
@@ -248,7 +255,11 @@ while True:
 
             if valid:
                 # Execute the algebraic expression
-                answer = hf.evaluate(exp_stack)         
+                if radian:
+                    answer = hf.evaluate(exp_stack)         
+                else: 
+                    answer = hf.evaluate(exp_stack, False)
+
 
                 if answer is None:
                     psg.popup_no_wait('You tried to divide by 0!')
@@ -283,6 +294,12 @@ while True:
                 continue
             else:
                 psg.popup_no_wait('Your parentheses do not match, or you must check for invalid symbols.')
+
+
+        case 'Radians':
+            radian = True
+        case 'Degrees':
+            radian = False
 
         case 'C':
             expression = ''
