@@ -98,20 +98,27 @@ menu_def =  [
 layout =    [
                 [psg.Menu(menu_def)],
 
-                [psg.T('Input:'), psg.In(key = '-EXP-'), psg.T('Output:'), psg.Txt(key = '-EQL-'), psg.Push()],     
+                [psg.T('Expression:'), psg.Multiline(key = '-EXP-', s = (30, 1), no_scrollbar = True, horizontal_scroll = True), 
+                    psg.VSep(), psg.T('Result:'), psg.Txt(key = '-EQL-'), psg.Push()],     
 
-                [psg.VPush()],
+                [psg.HSep()],
 
                 # Select between radians and degrees for trigonometric functions
                 [psg.Rad('Radians', "Angles", enable_events = True, default = True, key = 'Radians'), 
-                    psg.Rad('Degrees', "Angles", enable_events = True, key = 'Degrees')],
+                    psg.Rad('Degrees', "Angles", enable_events = True, key = 'Degrees'), psg.VSep()],
 
+                [psg.HSep()],
+                
                 [psg.B(' 1 '), psg.B(' 2 '), psg.B(' 3 '), psg.B(' + '), psg.B('Del', tooltip = 'Delete the last value'), psg.Push()],
                 [psg.B(' 4 '), psg.B(' 5 '), psg.Button(' 6 '), psg.B(' - '), psg.Push()],
                 [psg.B(' 7 '), psg.B(' 8 '), psg.B(' 9 '), psg.B(' * '), psg.Push()],
                 [psg.B(' . '), psg.B(' 0 '), psg.B(' ^ '), psg.B(' \u00f7 '), psg.Push()],
                 [psg.B(' ( '), psg.B(' C ', tooltip = 'Clear input'), psg.B(' ) '), psg.B(' = ', enable_events = True, 
                     bind_return_key = True), psg.B('Ans', tooltip = 'Previous answer'), psg.Push()],
+
+                [psg.VPush()],
+
+                [psg.HSep()],
 
                 [psg.VPush()],
 
@@ -175,7 +182,8 @@ while True:
             '/', '*', '^'}:  
         
         # Input of operator following a calculated output
-        expression = previous_ans   
+        expression = previous_ans  
+        exp_stack = [] 
         exp_stack.append(previous_ans)    
 
     if event in NUMS:
@@ -246,7 +254,7 @@ while True:
             exp_stack.append('math.sqrt(')
             expression += '\u221a('
 
-        case '=':
+        case '=' | '':
             if expression == '' or just_solved:
                 continue
 
@@ -280,12 +288,10 @@ while True:
                 just_solved = True
                 previous_ans = answer
                 history[expression] = answer
-                exp_stack = []
-                left_stack = []
 
-                if len(answer) <= 10 and float(answer).is_integer():
+                if len(answer) <= 20 and float(answer).is_integer():
                     window['-EQL-'].update(int(float(answer)))
-                elif len(answer) <= 10:
+                elif len(answer) <= 20:
                     window['-EQL-'].update(float(answer))
                 else:
                     # TODO
@@ -305,7 +311,6 @@ while True:
             expression = ''
             exp_stack = []
             left_stack = []
-            window['-EXP-'].update(expression)
         case 'Ans': 
             exp_stack.append(previous_ans)
             expression += previous_ans
@@ -318,6 +323,7 @@ while True:
 
     window['-EXP-'].update(expression)
     print(exp_stack)
+    print('->' + event + '<-')
 
 window.close()
 
