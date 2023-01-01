@@ -4,12 +4,7 @@ import hashlib as hs
 import numpy as np
 import scipy as sp
 import math
-
-
-left_par_idx = []       # Lists of parenthesis indices
-right_par_idx = []
-nums = []               # A list of all the numbers in the expression
-operators = ''          # A string of all the operators in the expression
+import matplotlib.pyplot as plt
 
 curr_dir = os.getcwd()  # Current directory
 
@@ -20,26 +15,34 @@ user_data = (open(pass_addy, 'r')).read()
 # Empty data reference
 A = ('', None)
 
+
+def degree_mode(expression: list) -> list:
+    """ Modify the expression list for degree mode, since math trig functions 
+    operate on radians"""
+
+    paren_track = []
+    for i, element in enumerate(expression):
+        if element in ('math.sin(', 'math.cos(', 'math.tan('):
+            expression.insert(i + 1, 'math.radians(')
+            for j in range(i + 2, len(expression)):
+                if expression[j] in ('math.sin(', 'math.cos(', 'math.tan(', 'math.sqrt(', '('):
+                    paren_track.append(1)
+                if expression[j] == ')':
+                    try:
+                        paren_track.pop()
+                    except(IndexError):    
+                        expression.insert(j, ')')
+                        break
+    return expression
+
+
 def evaluate(expression: list, radian: bool = True) -> float:
     """ Try to evaluate the expression. Returns a successful result as a float or raises
     exceptions for invalid expressions """
 
-    # If degrees are selected, we convert the parameters in the trig functions
-    # from radians to degrees
+    # Convert to degrees if selected
     if not radian:
-        paren_track = []
-        for i, element in enumerate(expression):
-            if element in ('math.sin(', 'math.cos(', 'math.tan('):
-                expression.insert(i + 1, 'math.radians(')
-                for j in range(i + 2, len(expression)):
-                    if expression[j] in ('math.sin(', 'math.cos(', 'math.tan(', 'math.sqrt(', '('):
-                        paren_track.append(1)
-                    if expression[j] == ')':
-                        try:
-                            paren_track.pop()
-                        except(IndexError):    
-                            expression.insert(j, ')')
-                            break
+        expression = degree_mode(expression)
 
     print(expression)
 
@@ -54,6 +57,39 @@ def evaluate(expression: list, radian: bool = True) -> float:
         return None
     except(ValueError):
         return '???'
+
+def generate_plot(expression: list, radian: bool = True):
+    """ Generate a plot of the function"""
+
+    # Convert to degrees if selected
+    if not radian:
+        expression = degree_mode(expression)
+    
+    # Convert from math to np to take advantage of vectorization
+    expression_string = ''.join(expression)
+    expression_string = expression_string.replace('math', 'np')
+
+    x = np.linspace(-100, 100, 1000)
+
+    print(expression_string)
+
+    try:
+        y = eval(expression_string)
+    except(NameError):
+        return '!!!'
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.spines['left'].set_position('center')
+    ax.spines['bottom'].set_position('center')
+    ax.spines['right'].set_color('none')
+    ax.spines['top'].set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    plt.plot(x, y, 'b')
+
+    plt.show()
 
 def history_list(history):
     """ Converts and reformats the history dictionary of previous calculations

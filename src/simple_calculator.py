@@ -104,8 +104,11 @@ layout =    [
                 [psg.HSep()],
 
                 # Select between radians and degrees for trigonometric functions
-                [psg.Rad('Radians', "Angles", enable_events = True, default = True, key = 'Radians'), 
-                    psg.Rad('Degrees', "Angles", enable_events = True, key = 'Degrees'), psg.VSep()],
+                [psg.Rad('Expression', "Mode", enable_events = True, default = True, key = 'XP'), psg.Rad('Function', "Mode", enable_events = True,
+                    key = 'FN'), psg.VSep(), psg.Rad('Radians', "Angles", enable_events = True, default = True, key = 'Radians'), 
+                    psg.Rad('Degrees', "Angles", enable_events = True, key = 'Degrees'), psg.VSep(), psg.T('Function: y='),
+                    psg.Multiline(key = '-FNC-', s = (30, 1), no_scrollbar = True, horizontal_scroll = True), psg.B('Plot'),
+                    psg.Push()],
 
                 [psg.HSep()],
                 
@@ -123,7 +126,7 @@ layout =    [
                 [psg.VPush()],
 
                 [psg.B(' \u221a '), psg.B(' E ', tooltip = 'Base 10 exponential'), psg.B(' e ', tooltip = 'Euler\'s number'), 
-                    psg.B(' \u03c0 '), psg.B('sin'), psg.B('cos'), psg.B('tan'),],
+                    psg.B(' \u03c0 '), psg.B('sin'), psg.B('cos'), psg.B('tan'), psg.B(' x ')],
                 
                 [psg.VPush()],
                 [psg.VPush()],
@@ -145,8 +148,10 @@ if not user_verified and login_id != 'USERNAME':
     window.close() 
 
 # Check if degrees or radians are selected
-
 radian = True
+
+# Check if we are in expression or function mode
+express = True
 
 # The expression is showed in the main window.
 # The exp_stack keeps track of the expression in the correct format for evaluation
@@ -191,6 +196,23 @@ while True:
         expression += event
 
     match event:
+
+        # Toggle between expression vs. function modes
+        case 'XP':
+            if not express:
+                expression = ''
+                exp_stack = []
+                left_stack = []
+                window['-FNC-'].update(expression)
+            express = True
+        case 'FN':
+            if express:
+                expression = ''
+                exp_stack = []
+                left_stack = []
+                window['-EXP-'].update(expression)
+            express = False
+
         case '(':
             left_stack.append(1)
             exp_stack.append('(')
@@ -255,6 +277,9 @@ while True:
             expression += '\u221a('
 
         case '=' | '':
+            if not express:
+                psg.popup_no_wait('You must be in expression mode.')
+                continue
             if expression == '' or just_solved:
                 continue
 
@@ -263,11 +288,7 @@ while True:
 
             if valid:
                 # Execute the algebraic expression
-                if radian:
-                    answer = hf.evaluate(exp_stack)         
-                else: 
-                    answer = hf.evaluate(exp_stack, False)
-
+                answer = hf.evaluate(exp_stack, radian)
 
                 if answer is None:
                     psg.popup_no_wait('You tried to divide by 0!')
@@ -278,7 +299,7 @@ while True:
                     continue
 
                 if answer == '???':
-                    psg.popup_no_wait('The result is undefined')
+                    psg.popup_no_wait('The result is undefined.')
                     continue
 
                 if answer <= (1.23e-16) and answer >= 0:
@@ -317,11 +338,34 @@ while True:
         case 'Memory':
             psg.popup_scrolled(hf.history_list(history), title = 'Memory')
 
+        case 'x':
+            if express:
+                psg.popup_no_wait('You must be in function mode.')
+                continue
+            exp_stack.append('x')
+            expression += 'x'
+
+        case 'Plot':
+            if express:
+                psg.popup_no_wait('You must be in function mode.')
+                continue
+            if left_stack:
+                psg.popup_no_wait('Your parentheses do not match, or you must check for invalid symbols.')
+                continue
+            graph = hf.generate_plot(exp_stack, radian)
+            if graph == '!!!':
+                psg.popup_no_wait('Please enter a valid function.')
+
+            
 
     if just_solved and len(expression) != check_len:
         just_solved = False         
 
-    window['-EXP-'].update(expression)
+    if express:
+        window['-EXP-'].update(expression)
+    else: 
+        window['-FNC-'].update(expression)
+
     print(exp_stack)
     print('->' + event + '<-')
 
