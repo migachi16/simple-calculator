@@ -75,10 +75,10 @@ def generate_plot(expression: list, radian: bool = True):
 
     try:
         y = eval(expression_string)
-    except(NameError):
+    except(NameError, SyntaxError):
         return '!!!'
 
-    fig = plt.figure()
+    fig = plt.figure(figsize = (6, 4))
     ax = fig.add_subplot(1, 1, 1)
     ax.spines['left'].set_position('center')
     ax.spines['bottom'].set_position('center')
@@ -89,7 +89,9 @@ def generate_plot(expression: list, radian: bool = True):
 
     plt.plot(x, y, 'b')
 
-    plt.show()
+    return fig
+
+    #plt.show()
 
 def history_list(history):
     """ Converts and reformats the history dictionary of previous calculations

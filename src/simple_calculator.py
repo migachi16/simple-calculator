@@ -1,5 +1,6 @@
 import PySimpleGUI as psg
 import helper_funcs as hf
+import matplotlib.pyplot as plt
 
 # Set theme and font
 psg.theme('TealMono')
@@ -95,6 +96,22 @@ menu_def =  [
                 ['Help', ['AMSC Guide', 'Settings']]
             ]
 
+calc = [
+    [psg.B(' 1 '), psg.B(' 2 '), psg.B(' 3 '), psg.B(' + '), psg.B('Del', tooltip = 'Delete the last value'), psg.Push()],
+    [psg.B(' 4 '), psg.B(' 5 '), psg.Button(' 6 '), psg.B(' - '), psg.Push()],
+    [psg.B(' 7 '), psg.B(' 8 '), psg.B(' 9 '), psg.B(' * '), psg.Push()],
+    [psg.B(' . '), psg.B(' 0 '), psg.B(' ^ '), psg.B(' \u00f7 '), psg.Push()],
+    [psg.B(' ( '), psg.B(' C ', tooltip = 'Clear input'), psg.B(' ) '), psg.B(' = ', enable_events = True, 
+        bind_return_key = True), psg.B('Ans', tooltip = 'Previous answer'), psg.Push()],
+]
+
+funcs = [[psg.B(' \u221a ')], [psg.B(' E ', tooltip = 'Base 10 exponential')], [psg.B(' e ', tooltip = 'Euler\'s number')], 
+                    [psg.B(' \u03c0 ')], [psg.B(' x ')],]
+
+trig = [
+    [psg.B('sin')], [psg.B('cos')], [psg.B('tan')]
+]
+
 layout =    [
                 [psg.Menu(menu_def)],
 
@@ -112,21 +129,9 @@ layout =    [
 
                 [psg.HSep()],
                 
-                [psg.B(' 1 '), psg.B(' 2 '), psg.B(' 3 '), psg.B(' + '), psg.B('Del', tooltip = 'Delete the last value'), psg.Push()],
-                [psg.B(' 4 '), psg.B(' 5 '), psg.Button(' 6 '), psg.B(' - '), psg.Push()],
-                [psg.B(' 7 '), psg.B(' 8 '), psg.B(' 9 '), psg.B(' * '), psg.Push()],
-                [psg.B(' . '), psg.B(' 0 '), psg.B(' ^ '), psg.B(' \u00f7 '), psg.Push()],
-                [psg.B(' ( '), psg.B(' C ', tooltip = 'Clear input'), psg.B(' ) '), psg.B(' = ', enable_events = True, 
-                    bind_return_key = True), psg.B('Ans', tooltip = 'Previous answer'), psg.Push()],
-
-                [psg.VPush()],
+                [psg.Column(calc), psg.VSep(), psg.Column(funcs), psg.Column(trig), psg.VSep(), psg.Image(filename = 'plot.png', key = '-PLT-')],
 
                 [psg.HSep()],
-
-                [psg.VPush()],
-
-                [psg.B(' \u221a '), psg.B(' E ', tooltip = 'Base 10 exponential'), psg.B(' e ', tooltip = 'Euler\'s number'), 
-                    psg.B(' \u03c0 '), psg.B('sin'), psg.B('cos'), psg.B('tan'), psg.B(' x ')],
                 
                 [psg.VPush()],
                 [psg.VPush()],
@@ -352,10 +357,14 @@ while True:
             if left_stack:
                 psg.popup_no_wait('Your parentheses do not match, or you must check for invalid symbols.')
                 continue
+
             graph = hf.generate_plot(exp_stack, radian)
+
             if graph == '!!!':
                 psg.popup_no_wait('Please enter a valid function.')
-
+            else:
+                graph.savefig('plot'.format('png'), bbox_inches = 'tight')
+                window['-PLT-'].update(filename = 'plot.png')
             
 
     if just_solved and len(expression) != check_len:
